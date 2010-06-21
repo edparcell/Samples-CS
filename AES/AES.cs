@@ -1,5 +1,8 @@
 
 using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AES
 {
@@ -8,7 +11,7 @@ namespace AES
 		private static byte[] salted_string = Encoding.UTF8.GetBytes("Salted__");
 		private static MD5 md5 = MD5.Create();
 
-		public static void Decipher(byte[] Data, byte[] key, byte[] iv)
+		public static string Decipher(byte[] Data, byte[] key, byte[] iv)
         {
 
 			RijndaelManaged rijndael = new RijndaelManaged();
@@ -21,7 +24,7 @@ namespace AES
 			
 			ICryptoTransform rijndaelDecryptor = rijndael.CreateDecryptor();
 			
-			MemoryStream msDecrypt = new MemoryStream(enc_data);
+			MemoryStream msDecrypt = new MemoryStream(Data);
             CryptoStream csDecrypt = new CryptoStream(msDecrypt, rijndaelDecryptor, CryptoStreamMode.Read);
             StreamReader srDecrypt = new StreamReader(csDecrypt);
 			
