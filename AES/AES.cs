@@ -24,36 +24,36 @@ namespace AES
 			string cipherText = srEncrypt.ReadToEnd();
 			return cipherText;
 		}
-
-		public static string Decipher(byte[] Data, byte[] key, byte[] iv)
-        {
-			RijndaelManaged rijndael = MakeRijndael(key, iv);
-			
-			ICryptoTransform rijndaelDecryptor = rijndael.CreateDecryptor();
-			
-			MemoryStream msDecrypt = new MemoryStream(Data);
-            CryptoStream csDecrypt = new CryptoStream(msDecrypt, rijndaelDecryptor, CryptoStreamMode.Read);
-            StreamReader srDecrypt = new StreamReader(csDecrypt);
-			
-			string clearText = srDecrypt.ReadToEnd();
-			return clearText;
-		}
 		
-		private static RijndaelManaged MakeRijndael (byte[] key, byte[] iv)
+		private static RijndaelManaged MakeRijndael (byte[] Key, byte[] IV)
 		{
 			RijndaelManaged rijndael = new RijndaelManaged();
 			rijndael.Mode = CipherMode.CBC;
 			rijndael.Padding = PaddingMode.PKCS7;
 			rijndael.KeySize = 128;
 			rijndael.BlockSize = 128;
-			rijndael.Key = key;
-			rijndael.IV = iv;
+			rijndael.Key = Key;
+			rijndael.IV = IV;
 			return rijndael;
 		}
 
-		public static string Decipher(string Data, string Password)
+		public static string Decipher(byte[] CipherData, byte[] Key, byte[] IV)
         {
-			byte[] enc_data = Convert.FromBase64String(Data);
+			RijndaelManaged rijndael = MakeRijndael(Key, IV);
+			
+			ICryptoTransform rijndaelDecryptor = rijndael.CreateDecryptor();
+			
+			MemoryStream msDecrypt = new MemoryStream(CipherData);
+            CryptoStream csDecrypt = new CryptoStream(msDecrypt, rijndaelDecryptor, CryptoStreamMode.Read);
+            StreamReader srDecrypt = new StreamReader(csDecrypt);
+			
+			string clearText = srDecrypt.ReadToEnd();
+			return clearText;
+		}
+
+		public static string Decipher(string CipherData, string Password)
+        {
+			byte[] enc_data = Convert.FromBase64String(CipherData);
 			byte[] password = Encoding.UTF8.GetBytes(Password);				
 			
 			byte[] salt = new byte[0];
