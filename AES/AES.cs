@@ -10,17 +10,24 @@ namespace AES
 	{
 		private static byte[] salted_string = Encoding.UTF8.GetBytes("Salted__");
 		private static MD5 md5 = MD5.Create();
+		
+		public static string Encipher(byte[] ClearText, byte[] key, byte[] iv)
+		{
+			RijndaelManaged rijndael = MakeRijndael(key, iv);
+			
+			ICryptoTransform rijndaelEncryptor = rijndael.CreateEncryptor();
+			
+			MemoryStream msEncrypt = new MemoryStream(Data);
+            CryptoStream csEncrypt = new CryptoStream(msEncrypt, rijndaelEncryptor, CryptoStreamMode.Write);
+            StreamReader srEncrypt = new StreamReader(csEncrypt);
+			
+			string cipherText = srEncrypt.ReadToEnd();
+			return cipherText;
+		}
 
 		public static string Decipher(byte[] Data, byte[] key, byte[] iv)
         {
-
-			RijndaelManaged rijndael = new RijndaelManaged();
-			rijndael.Mode = CipherMode.CBC;
-			rijndael.Padding = PaddingMode.PKCS7;
-			rijndael.KeySize = 128;
-			rijndael.BlockSize = 128;
-			rijndael.Key = key;
-			rijndael.IV = iv;
+			RijndaelManaged rijndael = MakeRijndael(key, iv);
 			
 			ICryptoTransform rijndaelDecryptor = rijndael.CreateDecryptor();
 			
@@ -30,6 +37,18 @@ namespace AES
 			
 			string clearText = srDecrypt.ReadToEnd();
 			return clearText;
+		}
+		
+		private static RijndaelManaged MakeRijndael (byte[] key, byte[] iv)
+		{
+			RijndaelManaged rijndael = new RijndaelManaged();
+			rijndael.Mode = CipherMode.CBC;
+			rijndael.Padding = PaddingMode.PKCS7;
+			rijndael.KeySize = 128;
+			rijndael.BlockSize = 128;
+			rijndael.Key = key;
+			rijndael.IV = iv;
+			return rijndael;
 		}
 
 		public static string Decipher(string Data, string Password)
