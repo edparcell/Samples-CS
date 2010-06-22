@@ -9,8 +9,8 @@ AES
 Sample code to encrypt and decrypt a string using the AES libraries in C#. This code is structured to be compatible with openssl.
 
 This code is based on information found at the following sources:
-http://deusty.blogspot.com/2009/04/decrypting-openssl-aes-files-in-c.html
-http://stackoverflow.com/questions/273452/c-implementations-of-aes-encryption
+* [Deusty: Decrypting OpenSSL AES files in C#](http://deusty.blogspot.com/2009/04/decrypting-openssl-aes-files-in-c.html)
+* [Stack Overflow: C# Implementations of AES encryption](http://stackoverflow.com/questions/273452/c-implementations-of-aes-encryption)
 
 Example openssl commands to encrypt, decrypt text:
 
