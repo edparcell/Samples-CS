@@ -18,18 +18,15 @@ namespace AES
 			
 			MemoryStream msEncrypt = new MemoryStream();
             using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, rijndaelEncryptor, CryptoStreamMode.Write))
+			using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
 			{
-				using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-				{
-					swEncrypt.Write(ClearText);
-				}
-			}			
+				swEncrypt.Write(ClearText);
+			}
 			return msEncrypt.ToArray();
 		}
 		
 		public static string Encipher(string ClearText, string Password, bool Salted)
         {
-			//byte[] enc_data = Encoding.UTF8.GetBytes(ClearText);
 			byte[] password = Encoding.UTF8.GetBytes(Password);				
 			byte[] salt = new byte[0];
 			if (Salted) 
@@ -41,47 +38,15 @@ namespace AES
 			
 			byte[] key = null;
 			byte[] iv = null;
-		
-			MD5 md5 = MD5.Create();
-			try
-			{
-				byte[] preKey = new byte[password.Length + salt.Length];
-				Buffer.BlockCopy(password, 0, preKey, 0, password.Length);
-				Buffer.BlockCopy(salt, 0, preKey, password.Length, salt.Length);
-				key = md5.ComputeHash(preKey);				
-				
-				byte[] preIV = new byte[key.Length + preKey.Length];				
-				Buffer.BlockCopy(key, 0, preIV, 0, key.Length);
-				Buffer.BlockCopy(preKey, 0, preIV, key.Length, preKey.Length);
-				iv = md5.ComputeHash(preIV);
-			}
-			finally
-			{
-				md5.Clear();
-			}
+			GetKeyAndIV (password, salt, out key, out iv);
 			
 			byte[] CipherText = Encipher(ClearText, key, iv);
 			if (Salted)
 			{
-				byte[] CipherTextWithSalt = new byte[salted_string.Length + salt.Length + CipherText.Length];
-				Buffer.BlockCopy(salted_string, 0, CipherTextWithSalt, 0, salted_string.Length);
-				Buffer.BlockCopy(salt, 0, CipherTextWithSalt, salted_string.Length, salt.Length);
-				Buffer.BlockCopy(CipherText, 0, CipherTextWithSalt, salted_string.Length + salt.Length, CipherText.Length);
+				byte[] CipherTextWithSalt = CopyBlocks(salted_string, salt, CipherText);
 				CipherText = CipherTextWithSalt;
 			}
 			return Convert.ToBase64String(CipherText);
-		}
-
-		private static RijndaelManaged MakeRijndael (byte[] Key, byte[] IV)
-		{
-			RijndaelManaged rijndael = new RijndaelManaged();
-			rijndael.Mode = CipherMode.CBC;
-			rijndael.Padding = PaddingMode.PKCS7;
-			rijndael.KeySize = 128;
-			rijndael.BlockSize = 128;
-			rijndael.Key = Key;
-			rijndael.IV = IV;
-			return rijndael;
 		}
 
 		public static string Decipher(byte[] CipherData, byte[] Key, byte[] IV)
@@ -116,28 +81,40 @@ namespace AES
 			}
 			
 			byte[] key = null;
-			byte[] iv = null;
-				
+			byte[] iv = null;				
+			GetKeyAndIV (password, salt, out key, out iv);
+			
+			return Decipher(enc_data, key, iv);
+        }
+		
+		private static void GetKeyAndIV (byte[] password, byte[] salt, out byte[] key, out byte[] iv)
+		{
 			MD5 md5 = MD5.Create();
 			try
 			{
-				byte[] preKey = new byte[password.Length + salt.Length];
-				Buffer.BlockCopy(password, 0, preKey, 0, password.Length);
-				Buffer.BlockCopy(salt, 0, preKey, password.Length, salt.Length);
+				byte[] preKey = CopyBlocks(password, salt);
 				key = md5.ComputeHash(preKey);				
 				
-				byte[] preIV = new byte[key.Length + preKey.Length];				
-				Buffer.BlockCopy(key, 0, preIV, 0, key.Length);
-				Buffer.BlockCopy(preKey, 0, preIV, key.Length, preKey.Length);
+				byte[] preIV = CopyBlocks(key, preKey);
 				iv = md5.ComputeHash(preIV);
 			}
 			finally
 			{
 				md5.Clear();
 			}
-			
-			return Decipher(enc_data, key, iv);
-        }
+		}
+
+		private static RijndaelManaged MakeRijndael (byte[] Key, byte[] IV)
+		{
+			RijndaelManaged rijndael = new RijndaelManaged();
+			rijndael.Mode = CipherMode.CBC;
+			rijndael.Padding = PaddingMode.PKCS7;
+			rijndael.KeySize = 128;
+			rijndael.BlockSize = 128;
+			rijndael.Key = Key;
+			rijndael.IV = IV;
+			return rijndael;
+		}
 
 		private static string ToHexString (byte[] b)
 		{
@@ -148,6 +125,19 @@ namespace AES
 			return sb.ToString();
 		}
 
+		private static byte[] CopyBlocks(params byte[][] blocks)
+		{
+			int length=0;
+			foreach (byte[] block in blocks) length += block.Length;
+			byte[] result = new byte[length];
+			int offset=0;
+			foreach (byte[] block in blocks)
+			{
+				Buffer.BlockCopy(block, 0, result, offset, block.Length);
+				offset += block.Length;
+			}
+			return result;
+		}
 
 		private static bool IsDataEqual (byte[] enc_data, int offset, byte[] salted_string, int length)
 		{
