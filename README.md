@@ -26,3 +26,19 @@ Example openssl commands to encrypt, decrypt text:
 	iv =B16138AF9773EFE1EAC5BD8C0639CC74
 	Hello, secure world!
 
+Convert2Ico
+-----------
+
+Sample code to load a .PNG file and save it as a .ICO file, suitable for use in a SystemTray app.
+
+NamedPipeServer/NamedPipeClient
+-------------------------------
+
+NamedPipeServer contains sample code to create a named pipe and listen for messages, and print them. NamedPipeClient contains sample code to connect to the named pipe and push a couple of messages. There is also a C++ sample client in the Samples-CXX repository.
+
+SystemTray
+----------
+
+SystemTray is a simple application that runs from the system tray. Right-clicking the tray icon displays a context menu. Left-clicking the tray icon displays the main window. The application does not quit if the main window is closed, instead continuing to run from the system tray.
+
+Note: These projects does not work on MonoDevelop on Mac.
