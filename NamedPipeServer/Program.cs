@@ -9,14 +9,14 @@ namespace NamedPipeServer
 {
     class Program
     {
-        public const string PIPE_NAME = @"\\.\pipe\examplePipe";
+        public const string PIPE_NAME = @"\\.\examplePipe";
 
         static void Main(string[] args)
         {
             Console.WriteLine("Creating pipe {0}", PIPE_NAME);
             NamedPipeServerStream pipeServer = new NamedPipeServerStream(
                 PIPE_NAME,
-                PipeDirection.In,
+                PipeDirection.InOut,
                 10,
                 PipeTransmissionMode.Message,
                 PipeOptions.None

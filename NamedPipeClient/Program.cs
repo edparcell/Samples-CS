@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO.Pipes;
+using System.Threading;
 
 namespace NamedPipeClient
 {
     class Program
     {
-        public const string PIPE_NAME = @"\\.\pipe\examplePipe";
+        public const string PIPE_NAME = @"\\.\examplePipe";
 
         static void Main(string[] args)
         {
