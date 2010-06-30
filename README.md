@@ -38,6 +38,13 @@ NamedPipeServer contains sample code to create a named pipe and listen for messa
 
 Note: These projects does not work on MonoDevelop on Mac.
 
+RabbitMQPub/RabbitMQSub
+-----------------------
+
+RabbitMQPub is a simple example of a RabbitMQ publisher that publishes a "Hello world" message once per second. RabbitMQSub is a simple example of a RabbitMQ consumer that listens for messages, printing their contents. When you run these together, RabbitMQSub should print each of the messages sent by RabbitMQPub.
+
+For a swift but useful introduction to the concepts behind messaging in RabbitMQ, I recommend looking at Dmitriy Samovskiy's presentation at http://www.slideshare.net/somic/introduction-to-amqp-messaging-with-rabbitmq
+
 SystemTray
 ----------
 
